@@ -28,7 +28,7 @@ public class PautaController {
     }
 
     @PostMapping("abrir")
-    public ResponseEntity<Object> abrirPauta(@RequestParam String id, @RequestParam int minutos) {
+    public ResponseEntity<Object> abrirPauta(@RequestParam("id") String id, @RequestParam(value = "minutos", required = false, defaultValue = "1") int minutos) {
         UUID pautaId = UUID.fromString(id);
         service.abrirPauta(pautaId, minutos);
         return ResponseEntity.status(HttpStatus.OK).body("Pauta para votação aberta.");
