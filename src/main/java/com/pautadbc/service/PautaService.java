@@ -71,7 +71,6 @@ public class PautaService {
             novoVoto.setCpf(cpf);
             votoRepository.save(novoVoto);
 
-            // Salvar o voto no banco de dados
             LocalDateTime fim = LocalDateTime.now();
             pauta.setFim(fim);
             pautaRepository.save(pauta);
