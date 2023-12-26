@@ -1,27 +1,26 @@
 package com.pautadbc.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
-
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"nome"})})
 @Entity
 public class Pauta  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+    @Column(unique = true)
+    private String nome;
+
+    private LocalDateTime inicio;
+    private LocalDateTime fim;
 
     public String getNome() {
         return nome;
     }
-
-    private LocalDateTime inicio;
-    private LocalDateTime fim;
 
     public Pauta() {
 
@@ -36,7 +35,6 @@ public class Pauta  {
         this.nome = nome;
     }
 
-    private String nome;
 
     public Pauta setId(UUID id) {
         this.id = id;
