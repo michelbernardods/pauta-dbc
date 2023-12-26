@@ -10,10 +10,6 @@ public class Voto {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-//    private String pauta;
-//    private LocalDateTime inicio;
-//    private LocalDateTime fim;
-
     @ManyToOne
     @JoinColumn(name = "pauta_id")
     private Pauta pauta;
