@@ -51,6 +51,10 @@ public class PautaService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Pauta não existe.");
         }
 
+        if (!validarCPF(cpf)) {
+            return ResponseEntity.status(HttpStatus.OK).body("CPF invalido");
+        }
+
         LocalDateTime agora = LocalDateTime.now();
         if (pauta.getFim() != null && agora.isAfter(pauta.getInicio())) {
             logger.info("Pauta encerrada");

@@ -39,14 +39,8 @@ public class PautaController {
 
     @PostMapping("votar")
     public ResponseEntity<Object> votar(@RequestParam UUID idPauta, String idAssociado, String voto, String cpf)  {
-        if (!validarCPF(cpf)) {
-            return ResponseEntity.status(HttpStatus.OK).body("CPF invalido");
-        }
-
-        service.registrarVoto(idPauta, idAssociado, voto, cpf);
-        return ResponseEntity.status(HttpStatus.OK).body("Voto registrado com sucesso.");
+        return service.registrarVoto(idPauta, idAssociado, voto, cpf);
     }
-
     @GetMapping("resultado/{id}")
     public ResponseEntity<String> obterResultadoVotacao(@PathVariable String id) {
         UUID pautaId = UUID.fromString(id);
