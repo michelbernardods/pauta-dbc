@@ -8,4 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface VotoRepository extends JpaRepository<Voto, Long> {
+    long countByPautaIdAndVoto(UUID idPauta, String voto);
+    boolean existsByPautaIdAndCpf(UUID idPauta, String cpf);
 }

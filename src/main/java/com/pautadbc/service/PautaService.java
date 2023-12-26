@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -42,6 +41,56 @@ public class PautaService {
         LocalDateTime inicio = LocalDateTime.now().plusMinutes(minutos);
         pauta.setInicio(inicio);
         pautaRepository.save(pauta);
+    }
+
+
+    public ResponseEntity<Object> registrarVoto(UUID idPauta, String idAssociado, String voto, String cpf) {
+        Pauta pauta = pautaRepository.findById(idPauta);
+        if (pauta.getId() == null) {
+            logger.info("Pauta não existe");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Pauta não existe.");
+        }
+
+        LocalDateTime agora = LocalDateTime.now();
+        if (pauta.getFim() != null && agora.isAfter(pauta.getInicio())) {
+            logger.info("Pauta encerrada");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Pauta encerrada.");
+        }
+
+        boolean cpfJaVotou = votoRepository.existsByPautaIdAndCpf(idPauta, cpf);
+        if (cpfJaVotou) {
+            logger.info("Esse CPF já votou nesta pauta");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esse CPF já votou nesta pauta.");
+        }
+
+        if (Objects.equals(voto, "sim") || Objects.equals(voto, "não")) {
+            Voto novoVoto = new Voto();
+            novoVoto.setIdAssociado(idAssociado);
+            novoVoto.setPauta(pauta);
+            novoVoto.setVoto(voto);
+            novoVoto.setCpf(cpf);
+            votoRepository.save(novoVoto);
+
+            // Salvar o voto no banco de dados
+            LocalDateTime fim = LocalDateTime.now();
+            pauta.setFim(fim);
+            pautaRepository.save(pauta);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Voto registrado com sucesso.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Voto inválido.");
+        }
+    }
+
+    public long contarVotosPorPauta(UUID idPauta, String voto) {
+        return votoRepository.countByPautaIdAndVoto(idPauta, voto);
+    }
+
+    public String obterResultadoVotacao(UUID idPauta) {
+        long votosSim = contarVotosPorPauta(idPauta, "sim");
+        long votosNao = contarVotosPorPauta(idPauta, "não");
+
+        return "Resultado da votação - Sim: " + votosSim + ", Não: " + votosNao;
     }
 
 

@@ -3,11 +3,14 @@ package com.pautadbc.controller;
 import com.pautadbc.model.Pauta;
 import com.pautadbc.service.PautaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+
+import static com.pautadbc.validador.Validador.validarCPF;
 
 
 @RestController
@@ -32,5 +35,31 @@ public class PautaController {
         UUID pautaId = UUID.fromString(id);
         service.abrirPauta(pautaId, minutos);
         return ResponseEntity.status(HttpStatus.OK).body("Pauta para votação aberta.");
+    }
+
+    @PostMapping("votar")
+    public ResponseEntity<Object> votar(@RequestParam UUID idPauta, String idAssociado, String voto, String cpf)  {
+        if (!validarCPF(cpf)) {
+            return ResponseEntity.status(HttpStatus.OK).body("CPF invalido");
+        }
+
+        service.registrarVoto(idPauta, idAssociado, voto, cpf);
+        return ResponseEntity.status(HttpStatus.OK).body("Voto registrado com sucesso.");
+    }
+
+    @GetMapping("resultado/{id}")
+    public ResponseEntity<String> obterResultadoVotacao(@PathVariable String id) {
+        UUID pautaId = UUID.fromString(id);
+        String resultado = service.obterResultadoVotacao(pautaId);
+        return ResponseEntity.status(HttpStatus.OK).body(resultado);
+    }
+
+    @ControllerAdvice
+    public class GlobalExceptionHandler {
+        @ExceptionHandler(DataIntegrityViolationException.class)
+        public ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+            String mensagem = "O nome da pauta já está cadastrado.";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mensagem);
+        }
     }
 }
